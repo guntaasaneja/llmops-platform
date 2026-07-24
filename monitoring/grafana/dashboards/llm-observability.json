@@ -1,0 +1,74 @@
+{
+  "title": "LLMOps Platform — Observability",
+  "uid": "llmops-observability",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Inference Latency (p50/p95/p99)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, sum(rate(llm_inference_latency_seconds_bucket[5m])) by (le))", "legendFormat": "p50" },
+        { "expr": "histogram_quantile(0.95, sum(rate(llm_inference_latency_seconds_bucket[5m])) by (le))", "legendFormat": "p95" },
+        { "expr": "histogram_quantile(0.99, sum(rate(llm_inference_latency_seconds_bucket[5m])) by (le))", "legendFormat": "p99" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Requests per Second by Model / Status",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "sum(rate(llm_inference_requests_total[1m])) by (model, status)", "legendFormat": "{{model}} - {{status}}" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Cumulative Cost (USD)",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 8, "w": 8, "h": 6 },
+      "targets": [
+        { "expr": "sum(llm_inference_cost_usd_total)" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Hallucination Score Distribution",
+      "type": "heatmap",
+      "gridPos": { "x": 8, "y": 8, "w": 8, "h": 6 },
+      "targets": [
+        { "expr": "sum(rate(llm_hallucination_score_bucket[10m])) by (le)" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Evaluation Pass Rate",
+      "type": "gauge",
+      "gridPos": { "x": 16, "y": 8, "w": 8, "h": 6 },
+      "targets": [
+        { "expr": "llm_eval_pass_rate" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Cache Hit Ratio",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 14, "w": 8, "h": 6 },
+      "targets": [
+        { "expr": "sum(llm_cache_hits_total) / (sum(llm_cache_hits_total) + sum(llm_cache_misses_total))" }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Tokens Used by Type",
+      "type": "timeseries",
+      "gridPos": { "x": 8, "y": 14, "w": 16, "h": 6 },
+      "targets": [
+        { "expr": "sum(rate(llm_tokens_used_total[5m])) by (model, token_type)", "legendFormat": "{{model}} - {{token_type}}" }
+      ]
+    }
+  ]
+}
